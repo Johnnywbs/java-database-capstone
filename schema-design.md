@@ -16,19 +16,28 @@ Stores profiles of medical staff.
 - **id**: INT, Primary Key, Auto Increment
 - **full_name**: VARCHAR(100), Not Null
 - **email**: VARCHAR(100), Unique, Not Null
-- **specialty**: VARCHAR(100), Not Null (e.g., Cardiology, General)
-- **office_hours**: VARCHAR(100) (e.g., "Mon-Fri 09:00-17:00")
+- **specialty**: VARCHAR(100), Not Null
+- **office_hours**: VARCHAR(100) (General availability)
+
+### Table: doctor_availability
+Manages specific time slots per doctor to prevent conflicts.
+- **id**: INT, Primary Key, Auto Increment
+- **doctor_id**: INT, Foreign Key -> doctors(id)
+- **available_date**: DATE, Not Null
+- **start_time**: TIME, Not Null
+- **end_time**: TIME, Not Null
+- **is_booked**: BOOLEAN, Default FALSE
 
 ### Table: clinic_locations
 Stores the physical branches of the clinic network.
 - **id**: INT, Primary Key, Auto Increment
-- **name**: VARCHAR(100), Not Null (e.g., "Downtown Clinic", "West Side Hub")
+- **name**: VARCHAR(100), Not Null
 - **address**: VARCHAR(255), Not Null
 - **city**: VARCHAR(100), Not Null
 - **contact_number**: VARCHAR(20)
 
 ### Table: appointments
-The core link between patients and doctors. Defines the schedule and location.
+The core link between patients and doctors. Defines the schedule.
 - **id**: INT, Primary Key, Auto Increment
 - **patient_id**: INT, Foreign Key -> patients(id) (ON DELETE CASCADE)
 - **doctor_id**: INT, Foreign Key -> doctors(id) (ON DELETE SET NULL)
@@ -40,18 +49,18 @@ The core link between patients and doctors. Defines the schedule and location.
 Tracks financial transactions linked to appointments.
 - **id**: INT, Primary Key, Auto Increment
 - **appointment_id**: INT, Foreign Key -> appointments(id)
-- **amount**: DECIMAL(10, 2), Not Null (Use DECIMAL to avoid currency rounding errors)
+- **amount**: DECIMAL(10, 2), Not Null
 - **payment_date**: DATETIME, Default CURRENT_TIMESTAMP
-- **method**: VARCHAR(50) (e.g., "Credit Card", "Cash", "Insurance Claim")
-- **status**: VARCHAR(20) (e.g., "Paid", "Pending", "Refunded")
+- **method**: VARCHAR(50)
+- **status**: VARCHAR(20)
 
 ### Table: patient_insurances
-Stores insurance details for patients to process billing coverage.
+Stores insurance details for billing coverage.
 - **id**: INT, Primary Key, Auto Increment
 - **patient_id**: INT, Foreign Key -> patients(id)
-- **provider_name**: VARCHAR(100), Not Null (e.g., "BlueCross", "Medicare")
+- **provider_name**: VARCHAR(100), Not Null
 - **policy_number**: VARCHAR(50), Unique, Not Null
-- **coverage_percentage**: DECIMAL(5, 2) (e.g., 80.00 for 80% coverage)
+- **coverage_percentage**: DECIMAL(5, 2)
 
 ### Table: admin
 Stores credentials for system administrators.
@@ -64,7 +73,7 @@ Stores credentials for system administrators.
 ## MongoDB Collection Design
 
 ### Collection: prescriptions
-Stores medical prescriptions issued after an appointment. Using MongoDB allows for flexibility (e.g., varying number of medications, nested pharmacy details) without complex joins.
+Stores medical prescriptions.
 
 **Example Document:**
 ```json
@@ -72,25 +81,9 @@ Stores medical prescriptions issued after an appointment. Using MongoDB allows f
   "_id": "ObjectId('64abc123456')",
   "appointmentId": 105,
   "patientId": 45,
-  "doctorName": "Dr. Smith",
   "issueDate": "2023-10-25T14:30:00Z",
   "medications": [
-    {
-      "name": "Amoxicillin",
-      "dosage": "500mg",
-      "frequency": "Every 8 hours",
-      "duration": "7 days"
-    },
-    {
-      "name": "Ibuprofen",
-      "dosage": "400mg",
-      "frequency": "As needed for pain"
-    }
+    { "name": "Amoxicillin", "dosage": "500mg", "duration": "7 days" }
   ],
-  "doctorNotes": "Patient should drink plenty of water and rest.",
-  "pharmacyRecommendation": {
-    "name": "City Central Pharmacy",
-    "address": "123 Main St",
-    "phone": "555-0199"
-  }
+  "doctorNotes": "Patient should drink plenty of water."
 }
