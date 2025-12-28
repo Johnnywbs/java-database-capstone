@@ -1,5 +1,3 @@
----
-
 ## Admin User Stories
 
 **Title: Admin Login**
