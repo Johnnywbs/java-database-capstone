@@ -27,78 +27,56 @@ public class Doctor {
 
     @NotNull(message = "A senha é obrigatória")
     @Size(min = 6, message = "A senha deve ter pelo menos 6 caracteres")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Oculta a senha nas respostas JSON
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @NotNull(message = "O telefone é obrigatório")
     @Pattern(regexp = "\\d{10}", message = "O número de telefone deve ter 10 dígitos")
     private String phone;
 
-    // O JPA cria uma tabela auxiliar para armazenar essa lista de Strings
     @ElementCollection
     @CollectionTable(name = "doctor_availability", joinColumns = @JoinColumn(name = "doctor_id"))
     @Column(name = "available_time")
     private List<String> availableTimes;
 
-    // Construtor Padrão
-    public Doctor() {
-    }
+    // --- Campos Extras (Bonus) ---
+
+    @Min(value = 0, message = "Anos de experiência não podem ser negativos")
+    private Integer yearsOfExperience;
+
+    @Min(value = 0, message = "A avaliação mínima é 0")
+    @Max(value = 5, message = "A avaliação máxima é 5")
+    private Double rating;
+
+    // --- Construtores ---
+    public Doctor() {}
 
     // --- Getters e Setters ---
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public String getSpecialty() { return specialty; }
+    public void setSpecialty(String specialty) { this.specialty = specialty; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getSpecialty() {
-        return specialty;
-    }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
-    }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
 
-    public String getEmail() {
-        return email;
-    }
+    public List<String> getAvailableTimes() { return availableTimes; }
+    public void setAvailableTimes(List<String> availableTimes) { this.availableTimes = availableTimes; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public Integer getYearsOfExperience() { return yearsOfExperience; }
+    public void setYearsOfExperience(Integer yearsOfExperience) { this.yearsOfExperience = yearsOfExperience; }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public List<String> getAvailableTimes() {
-        return availableTimes;
-    }
-
-    public void setAvailableTimes(List<String> availableTimes) {
-        this.availableTimes = availableTimes;
-    }
+    public Double getRating() { return rating; }
+    public void setRating(Double rating) { this.rating = rating; }
 }
