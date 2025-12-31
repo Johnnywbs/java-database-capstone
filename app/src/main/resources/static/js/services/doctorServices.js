@@ -1,53 +1,86 @@
-/*
-  Import the base API URL from the config file
-  Define a constant DOCTOR_API to hold the full endpoint for doctor-related actions
+// 1. Import API Base URL
+import { API_BASE_URL } from "../config/config.js";
 
+// 2. Set Doctor API Endpoint
+const DOCTOR_API = API_BASE_URL + '/doctor';
 
-  Function: getDoctors
-  Purpose: Fetch the list of all doctors from the API
+// 3. Get All Doctors
+export async function getDoctors() {
+    try {
+        const response = await fetch(DOCTOR_API);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error("Failed to fetch doctors:", response.status);
+            return [];
+        }
+    } catch (error) {
+        console.error("Error fetching doctors:", error);
+        return [];
+    }
+}
 
-   Use fetch() to send a GET request to the DOCTOR_API endpoint
-   Convert the response to JSON
-   Return the 'doctors' array from the response
-   If there's an error (e.g., network issue), log it and return an empty array
+// 4. Delete a Doctor
+export async function deleteDoctor(id, token) {
+    try {
+        const response = await fetch(`${DOCTOR_API}/${id}/${token}`, {
+            method: 'DELETE'
+        });
 
+        if (response.ok) {
+            return { success: true, message: "Doctor deleted successfully" };
+        } else {
+            return { success: false, message: "Failed to delete doctor" };
+        }
+    } catch (error) {
+        console.error("Error deleting doctor:", error);
+        return { success: false, message: "Network error occurred" };
+    }
+}
 
-  Function: deleteDoctor
-  Purpose: Delete a specific doctor using their ID and an authentication token
+// 5. Save (Add) a New Doctor
+export async function saveDoctor(doctor, token) {
+    try {
+        const response = await fetch(`${DOCTOR_API}/register/${token}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(doctor)
+        });
 
-   Use fetch() with the DELETE method
-    - The URL includes the doctor ID and token as path parameters
-   Convert the response to JSON
-   Return an object with:
-    - success: true if deletion was successful
-    - message: message from the server
-   If an error occurs, log it and return a default failure response
+        if (response.ok) {
+            const data = await response.text(); // Assuming backend returns text message
+            return { success: true, message: data };
+        } else {
+            return { success: false, message: "Failed to add doctor" };
+        }
+    } catch (error) {
+        console.error("Error saving doctor:", error);
+        return { success: false, message: "Network error occurred" };
+    }
+}
 
+// 6. Filter Doctors
+export async function filterDoctors(name, time, specialty) {
+    // Handle empty/null values to build correct URL params
+    const filterName = name || 'null';
+    const filterTime = time || 'null';
+    const filterSpecialty = specialty || 'null';
 
-  Function: saveDoctor
-  Purpose: Save (create) a new doctor using a POST request
+    const url = `${DOCTOR_API}/${filterName}/${filterTime}/${filterSpecialty}`;
 
-   Use fetch() with the POST method
-    - URL includes the token in the path
-    - Set headers to specify JSON content type
-    - Convert the doctor object to JSON in the request body
-
-   Parse the JSON response and return:
-    - success: whether the request succeeded
-    - message: from the server
-
-   Catch and log errors
-    - Return a failure response if an error occurs
-
-
-  Function: filterDoctors
-  Purpose: Fetch doctors based on filtering criteria (name, time, and specialty)
-
-   Use fetch() with the GET method
-    - Include the name, time, and specialty as URL path parameters
-   Check if the response is OK
-    - If yes, parse and return the doctor data
-    - If no, log the error and return an object with an empty 'doctors' array
-
-   Catch any other errors, alert the user, and return a default empty result
-*/
+    try {
+        const response = await fetch(url);
+        if (response.ok) {
+            return await response.json();
+        } else {
+            console.error("Failed to filter doctors");
+            return [];
+        }
+    } catch (error) {
+        console.error("Error filtering doctors:", error);
+        alert("An error occurred while filtering doctors.");
+        return [];
+    }
+}
